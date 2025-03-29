@@ -38,7 +38,7 @@ def main():
                 # Print variable value
                 value = os.getenv(sys.argv[1])
                 if value is None:
-                    print(f"Variable {sys.argv[1]} not found")
+                    print(f"Variable {sys.argv[1]} not found in .env file")
                 else:
                     print(value)
                 return
