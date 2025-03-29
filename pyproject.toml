@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mydotenv"
-version = "0.1.14"
+version = "0.1.15"
 description = "A simple package to manage environment variables with command-line interface"
 authors = [
     { name = "Mike Shaffer", email = "mikejshaffer@gmail.com" }
@@ -28,7 +28,7 @@ classifiers = [
 ]
 
 [project.scripts]
-mydotenv = "mike.__init__:main"
+mydotenv = "mydotenv.__init__:main"
 
 [project.entry-points."mydotenv.commands"]
-set_command = "mike.config:set_command_name" 
+set_command = "mydotenv.config:set_command_name" 
