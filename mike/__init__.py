@@ -49,7 +49,8 @@ def main():
         for line in f:
             line = line.strip()
             if line and not line.startswith('#'):
-                print(line)
+                key, value = line.split('=', 1)
+                print(f"{key} = {value}")
 
 if __name__ == '__main__':
     main()
