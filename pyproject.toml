@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mydotenv"
-version = "0.1.12"
+version = "0.1.13"
 description = "A simple package to manage environment variables with command-line interface"
 authors = [
     { name = "Mike Shaffer", email = "mikejshaffer@gmail.com" }
