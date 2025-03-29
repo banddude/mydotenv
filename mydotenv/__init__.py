@@ -12,7 +12,8 @@ if not env_path:
 load_dotenv(env_path)
 
 # Expose all environment variables
-globals().update(os.environ)
+for key, value in os.environ.items():
+    globals()[key] = value
 
 def main():
     """Main entry point for the CLI"""
