@@ -1,100 +1,55 @@
 import os
-import argparse
-from dotenv import load_dotenv, set_key, unset_key, dotenv_values
+import sys
 from pathlib import Path
+from dotenv import load_dotenv, set_key, unset_key, find_dotenv
 from . import config
 
-# Get the package directory
-PACKAGE_DIR = Path(__file__).parent
-ENV_FILE = PACKAGE_DIR / '.env'
-
-def load_env():
-    """Load environment variables from .env file"""
-    if not ENV_FILE.exists():
-        ENV_FILE.touch()
-    load_dotenv(ENV_FILE)
-
-def get_env_vars():
-    """Get only the variables from .env file"""
-    if not ENV_FILE.exists():
-        return {}
-    return dotenv_values(ENV_FILE)
-
-def delete_env_var(key):
-    """Delete a variable from the .env file"""
-    if not ENV_FILE.exists():
-        return False
-    
-    # Read all lines from .env
-    with open(ENV_FILE, 'r') as f:
-        lines = f.readlines()
-    
-    # Write back lines that don't start with the key
-    with open(ENV_FILE, 'w') as f:
-        for line in lines:
-            if not line.strip() or line.strip().startswith('#'):
-                f.write(line)
-                continue
-            parts = line.split('=', 1)
-            if len(parts) == 2 and parts[0].strip() == key:
-                continue
-            f.write(line)
-    
-    return True
-
-# Automatically load environment variables when the package is imported
-load_env()
-
-# Add all environment variables to the module's namespace
-globals().update(get_env_vars())
-
 def main():
-    parser = argparse.ArgumentParser(description='Manage environment variables in .env file')
-    parser.add_argument('args', nargs='*', help='Variable to read or KEY=VALUE to set')
-    parser.add_argument('--set-command', help='Set a custom command name for the CLI')
-    args = parser.parse_args()
-
-    # Handle command name configuration
-    if args.set_command:
-        config.set_command_name(args.set_command)
+    """Main entry point for the CLI"""
+    if len(sys.argv) > 1 and sys.argv[1] == '--set-command':
+        if len(sys.argv) != 3:
+            print("Usage: mydotenv --set-command NAME")
+            return
+        config.set_command_name(sys.argv[2])
         return
 
-    if not args.args:
-        cmd_name = config.get_command_name()
-        print(f"{cmd_name} package is installed and working!")
-        print("\nCurrent environment variables:")
-        env_vars = get_env_vars()
-        for key, value in env_vars.items():
-            print(f"{key} = {value}")
-        return
+    # Load environment variables
+    env_path = find_dotenv()
+    if not env_path:
+        env_path = Path.cwd() / '.env'
+        env_path.touch()
+    load_dotenv(env_path)
 
-    arg = args.args[0]
-    if len(args.args) > 1 and args.args[0] == 'delete':
-        # Handle delete command
-        key = args.args[1]
-        if delete_env_var(key):
-            print(f"Deleted {key} from .env file")
+    # Handle commands
+    if len(sys.argv) > 1:
+        if sys.argv[1] == 'delete':
+            if len(sys.argv) != 3:
+                print("Usage: mydotenv delete VARIABLE_NAME")
+                return
+            unset_key(env_path, sys.argv[2])
+            print(f"Deleted {sys.argv[2]} from .env file")
         else:
-            print(f"Variable {key} not found in .env file")
-    elif '=' in arg:
-        # Set variable
-        key, value = arg.split('=', 1)
-        set_key(ENV_FILE, key, value)
-        print(f"Updated {key} in .env file")
-    else:
-        # Read variable
-        env_vars = get_env_vars()
-        value = env_vars.get(arg)
-        if value is not None:
-            print(value)
-        else:
-            print(f"Variable {arg} not found in .env file")
+            # Check if it's a variable assignment
+            if '=' in sys.argv[1]:
+                key, value = sys.argv[1].split('=', 1)
+                set_key(env_path, key, value)
+                print(f"Updated {key} in .env file")
+            else:
+                # Print variable value
+                value = os.getenv(sys.argv[1])
+                if value is None:
+                    print(f"Variable {sys.argv[1]} not found")
+                else:
+                    print(value)
+                return
 
-    # Show current variables after any operation
+    # Print all variables
     print("\nCurrent environment variables:")
-    env_vars = get_env_vars()
-    for key, value in env_vars.items():
-        print(f"{key} = {value}")
+    with open(env_path) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#'):
+                print(line)
 
 if __name__ == '__main__':
     main()
