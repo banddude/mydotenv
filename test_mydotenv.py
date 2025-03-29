@@ -2,10 +2,10 @@ import subprocess
 import os
 
 def test_mydotenv():
-    print("\n=== Testing mydotenv package ===\n")
+    print("\n=== Testing mike package ===\n")
     
     def run_command(args):
-        result = subprocess.run(['mydotenv'] + args, capture_output=True, text=True)
+        result = subprocess.run(['mike'] + args, capture_output=True, text=True)
         print(result.stdout)
         if result.stderr:
             print(result.stderr)

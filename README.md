@@ -16,7 +16,7 @@ pip install mydotenv
 
 ### From Source
 ```bash
-git clone https://github.com/mikejshaffer/mydotenv.git
+git clone https://github.com/banddude/mydotenv.git
 cd mydotenv
 pip install -e .
 ```

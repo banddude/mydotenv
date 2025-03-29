@@ -4,6 +4,16 @@ from pathlib import Path
 from dotenv import load_dotenv, set_key, unset_key, find_dotenv
 from . import config
 
+# Load environment variables
+env_path = find_dotenv()
+if not env_path:
+    env_path = Path.cwd() / '.env'
+    env_path.touch()
+load_dotenv(env_path)
+
+# Expose all environment variables
+globals().update(os.environ)
+
 def main():
     """Main entry point for the CLI"""
     if len(sys.argv) > 1 and sys.argv[1] == '--set-command':
@@ -12,13 +22,6 @@ def main():
             return
         config.set_command_name(sys.argv[2])
         return
-
-    # Load environment variables
-    env_path = find_dotenv()
-    if not env_path:
-        env_path = Path.cwd() / '.env'
-        env_path.touch()
-    load_dotenv(env_path)
 
     # Handle commands
     if len(sys.argv) > 1:
